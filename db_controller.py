@@ -2,17 +2,20 @@ import sqlite3
 from configs import DATA_BASE_CONFIG
 from models.data_models import PlayerData, PlayerPassword
 
-def create_new_player(login: str, password: str) -> bool:
+def checking_login_for_uniqueness(login: str) -> bool:
     connection = sqlite3.connect(DATA_BASE_CONFIG.path)
     cursor = connection.cursor()
-
     cursor.execute(
         f"SELECT count(login)>0 FROM Players WHERE login = '{login}'"
     )
     result = cursor.fetchall()[0][0]
-    if result == True:
-        connection.close()
-        return False
+    connection.close()
+
+    return result != True
+
+def create_new_player(login: str, password: str) -> bool:
+    connection = sqlite3.connect(DATA_BASE_CONFIG.path)
+    cursor = connection.cursor()
 
     cursor.execute(
         f"INSERT INTO Players (login, password, score) VALUES ('{login}', '{password}', 0)"

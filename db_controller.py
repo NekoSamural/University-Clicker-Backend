@@ -2,6 +2,27 @@ import sqlite3
 from configs import DATA_BASE_CONFIG
 from models.data_models import PlayerData, PlayerPassword
 
+def create_new_player(login: str, password: str) -> bool:
+    connection = sqlite3.connect(DATA_BASE_CONFIG.path)
+    cursor = connection.cursor()
+
+    cursor.execute(
+        f"SELECT count(login)>0 FROM Players WHERE login = '{login}'"
+    )
+    result = cursor.fetchall()[0][0]
+    if result == True:
+        connection.close()
+        return False
+
+    cursor.execute(
+        f"INSERT INTO Players (login, password, score) VALUES ('{login}', '{password}', 0)"
+    )
+
+    connection.commit()
+    connection.close()
+
+    return True
+
 def get_player_data_by_login(login:str) -> PlayerPassword | None:
     connection = sqlite3.connect(DATA_BASE_CONFIG.path)
     cursor = connection.cursor()

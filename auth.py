@@ -2,9 +2,9 @@ import jwt
 import db_controller
 from configs import AUTH_JWT_CONFIG
 from datetime import datetime
-from models.api_data_models import Authentication, TokenInfo
+from models.api_data_models import AuthModel, TokenModel
 
-def create_token_for_player(data: Authentication) -> TokenInfo | None:
+def create_token_for_player(data: AuthModel) -> TokenModel | None:
     player_data = db_controller.get_player_data_by_login(data.login)
 
     if player_data == None:
@@ -22,7 +22,7 @@ def create_token_for_player(data: Authentication) -> TokenInfo | None:
     if db_controller.update_player_token(player_data.id, new_token) == False:
         return None
     
-    return TokenInfo( access_token = new_token, token_type = "Bearer") 
+    return TokenModel( access_token = new_token, token_type = "Bearer") 
 
 def generate_token(sub : str, private_key: str, algorithm: str) -> str:
     now = datetime.utcnow()

@@ -22,3 +22,15 @@ class ErrorResponse:
             },
         }
     }
+
+    HTTP_401_INVALID_LOGIN = {
+        401: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Invalid login"
+                    }
+                }
+            },
+        }
+    }

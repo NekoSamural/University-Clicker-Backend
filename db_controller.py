@@ -13,7 +13,7 @@ def checking_login_for_uniqueness(login: str) -> bool:
 
     return result != True
 
-def create_new_player(login: str, password: str) -> bool:
+def create_new_player(login: str, password: str):
     connection = sqlite3.connect(DATA_BASE_CONFIG.path)
     cursor = connection.cursor()
 
@@ -23,8 +23,6 @@ def create_new_player(login: str, password: str) -> bool:
 
     connection.commit()
     connection.close()
-
-    return True
 
 def get_player_data_by_login(login:str) -> PlayerPassword | None:
     connection = sqlite3.connect(DATA_BASE_CONFIG.path)

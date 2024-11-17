@@ -3,14 +3,15 @@ import db_controller
 from configs import AUTH_JWT_CONFIG
 from datetime import datetime
 from models.api_data_models import AuthModel, TokenModel
+import bcrypt
 
 def create_token_for_player(data: AuthModel) -> TokenModel | None:
-    player_data = db_controller.get_player_data_by_login(data.login)
+    player_data = db_controller.get_player_password_by_login(data.login)
 
     if player_data == None:
         return None
 
-    if data.password != player_data.password :
+    if bcrypt.checkpw(data.password.encode(), player_data.password.encode()) != True:
         return None
     
     new_token = generate_token(

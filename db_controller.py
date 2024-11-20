@@ -28,15 +28,16 @@ def create_new_player(login: str, password: str):
     hashPassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     update(f"INSERT INTO Players (login, password, score) VALUES ('{login}', '{hashPassword.decode()}', 0)")
 
-def get_player_password_by_login(login:str) -> PlayerPassword | None:
-    result = get(f"SELECT id, password FROM Players WHERE login = '{login}' LIMIT 1")
+def get_player_autch_data_by_login(login:str) -> PlayerPassword | None:
+    result = get(f"SELECT id, password, login FROM Players WHERE login = '{login}' LIMIT 1")
 
     if len(result) == 0:
         return None
     
     id = result[0][0]
     password = result[0][1]
-    return PlayerPassword(id, password)
+    login = result[0][2]
+    return PlayerPassword(id, password, login)
 
 def update_player_token(id:int, token:str) -> bool:
     if get(f"SELECT count(id)>0 FROM Players WHERE id = '{id}'")[0][0] != True:

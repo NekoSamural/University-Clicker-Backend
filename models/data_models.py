@@ -6,6 +6,7 @@ class PlayerData():
        self.prewUpdateTime = prewUpdateTime
 
 class PlayerPassword():
-    def __init__(self, id: int, password: str):
-       self.id = id 
-       self.password = password
+    def __init__(self, id: int, password: str, login: str):
+        self.id = id 
+        self.password = password
+        self.login = login

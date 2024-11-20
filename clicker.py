@@ -14,14 +14,14 @@ def click(token: str) -> ClickResultCodes:
     if player_info == None:
         return ClickResultCodes.invalid_token
     
-    current_unix_time = datetime.now().timestamp()
+    if player_info.prewUpdateTime != None:
 
-    if current_unix_time - player_info.prewUpdateTime <= CLICK_REQUEST_TIME:
-        print(current_unix_time - player_info.prewUpdateTime)
-        return ClickResultCodes.too_many_request
-    
+        current_unix_time = datetime.now().timestamp()
+
+        if current_unix_time - player_info.prewUpdateTime <= CLICK_REQUEST_TIME:
+            return ClickResultCodes.too_many_request
+        
     new_score = player_info.score + 1
-
     if db_controller.update_player_score(player_info.id, new_score) == False:
         return ClickResultCodes.invalid_token
     

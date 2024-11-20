@@ -13,3 +13,7 @@ class StatusModel(BaseModel):
 
 class ScoreResponseModel(BaseModel):
     score: int
+
+class TopPlayerModel(BaseModel):
+    name: str
+    score: int

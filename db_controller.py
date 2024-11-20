@@ -1,6 +1,7 @@
 import sqlite3
 from configs import DATA_BASE_CONFIG
 from models.data_models import PlayerData, PlayerPassword
+from models.api_data_models import TopPlayerModel
 import bcrypt
 from datetime import datetime
 
@@ -76,3 +77,15 @@ def get_player_score_by_id(id:int) -> int | None:
         return None
     
     return result[0][0]
+
+def get_top_players() -> list[TopPlayerModel] | None:
+    result = get(f"SELECT login, score FROM players ORDER BY score DESC LIMIT 5")
+
+    if len(result) == 0:
+        return None
+    
+    players = list()
+    for player in result:
+        players.append(TopPlayerModel(name = player[0], score = player[1]))
+    
+    return players

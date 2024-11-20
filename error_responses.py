@@ -46,3 +46,15 @@ class ErrorResponse:
             },
         }
     }
+
+    HTTP_404_NOT_FOUND_ID = {
+        429: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Id not found"
+                    }
+                }
+            },
+        }
+    }

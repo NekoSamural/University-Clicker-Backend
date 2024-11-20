@@ -38,19 +38,10 @@ def get_player_password_by_login(login:str) -> PlayerPassword | None:
     return PlayerPassword(id, password)
 
 def update_player_token(id:int, token:str) -> bool:
-
     if get(f"SELECT count(id)>0 FROM Players WHERE id = '{id}'")[0][0] != True:
         return False
     
     update(f"UPDATE Players SET token = '{token}' WHERE id = '{id}'")
-    return True
-
-def update_player_score(id:int, score:int) -> bool:
-    if get(f"SELECT count(id)>0 FROM Players WHERE id = '{id}'")[0][0] != True:
-        return False
-
-    current_unix_time = datetime.now().timestamp()
-    update(f"UPDATE Players SET score = '{score}', prewUpdateTime = '{current_unix_time}' WHERE id = '{id}'")
     return True
 
 def get_player_data_by_token(token:str) -> PlayerData | None:
@@ -67,3 +58,21 @@ def get_player_data_by_token(token:str) -> PlayerData | None:
     prewUpdateTime = result[0][3]
 
     return PlayerData(id, login, score, prewUpdateTime)
+
+def update_player_score(id:int, score:int) -> bool:
+    if get(f"SELECT count(id)>0 FROM Players WHERE id = '{id}'")[0][0] != True:
+        return False
+
+    current_unix_time = datetime.now().timestamp()
+    update(f"UPDATE Players SET score = '{score}', prewUpdateTime = '{current_unix_time}' WHERE id = '{id}'")
+    return True
+
+def get_player_score_by_id(id:int) -> int | None:
+    if get(f"SELECT count(id)>0 FROM Players WHERE id = '{id}'")[0][0] != True:
+        return None
+    
+    result = get(f"SELECT score FROM Players WHERE id = '{id}' LIMIT 1")
+    if len(result) == 0:
+        return None
+    
+    return result[0][0]

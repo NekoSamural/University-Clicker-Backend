@@ -10,3 +10,6 @@ class TokenModel(BaseModel):
 
 class StatusModel(BaseModel):
     status: bool
+
+class ScoreResponseModel(BaseModel):
+    score: int

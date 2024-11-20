@@ -1,13 +1,14 @@
 from fastapi import FastAPI, status, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from models.api_data_models import AuthModel, TokenModel, StatusModel
+from models.api_data_models import AuthModel, TokenModel, StatusModel, ScoreResponseModel
 from error_responses import ErrorResponse
 from auth import create_token_for_player
 import clicker
 import db_controller
 
 app = FastAPI(
-    title="Clicker-Backend"
+    title="Бекенд кликера",
+    version="1.0"
 )
 
 http_bearer = HTTPBearer()
@@ -16,7 +17,8 @@ http_bearer = HTTPBearer()
 @app.post(path = "/registration",
     response_model = StatusModel,
     status_code = status.HTTP_200_OK,
-    responses = ErrorResponse.HTTP_401_INVALID_LOGIN
+    responses = ErrorResponse.HTTP_401_INVALID_LOGIN,
+    description="Запрос на регистрацию нового пользователя."
 )
 async def registration(reg_data: AuthModel):
     if db_controller.checking_login_for_uniqueness(reg_data.login) == False:
@@ -34,7 +36,8 @@ async def registration(reg_data: AuthModel):
 @app.post(path = "/auth",
     response_model = TokenModel,
     status_code = status.HTTP_200_OK,
-    responses = ErrorResponse.HTTP_401_INVALID_LOGIN_OR_PASSWORD
+    responses = ErrorResponse.HTTP_401_INVALID_LOGIN_OR_PASSWORD,
+    description="Запрос на получение токена."
 )
 async def auth(auth: AuthModel):
     token = create_token_for_player(auth)
@@ -50,7 +53,8 @@ async def auth(auth: AuthModel):
 @app.put(path = "/click",
     response_model = StatusModel,
     status_code = status.HTTP_200_OK,
-    responses = ErrorResponse.HTTP_401_UNAUTHORIZED | ErrorResponse.HTTP_429_TOO_MANY_REQUESTS
+    responses = ErrorResponse.HTTP_401_UNAUTHORIZED | ErrorResponse.HTTP_429_TOO_MANY_REQUESTS,
+    description="Запрос на клик. Есть ограничение на 5 кликов в секунду."
 )
 async def click(token: HTTPAuthorizationCredentials = Depends(http_bearer)):
 
@@ -70,8 +74,26 @@ async def click(token: HTTPAuthorizationCredentials = Depends(http_bearer)):
     
     return StatusModel(status=True)
 
+#-------------------- Получение счёта
+@app.get(path = "/get-player-score/{id}",
+    response_model = ScoreResponseModel,
+    status_code = status.HTTP_200_OK,
+    responses = ErrorResponse.HTTP_404_NOT_FOUND_ID,
+    description="Запрос на получение очков игрока по id."
+)
+async def get_player_score(id: int):
+    palyerScore = db_controller.get_player_score_by_id(id)
+
+    if palyerScore == None:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Id not found"
+        )
+    return ScoreResponseModel(score = palyerScore)
+
 #команда для запуска
 #uvicorn app:app --host 0.0.0.0 --port 7777 --reload
 
 #Документация
 #http://127.1.1.1:7777/docs
+#http://127.1.1.1:7777/redoc

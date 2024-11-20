@@ -34,3 +34,15 @@ class ErrorResponse:
             },
         }
     }
+
+    HTTP_429_TOO_MANY_REQUESTS = {
+        429: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Too Many Requests"
+                    }
+                }
+            },
+        }
+    }

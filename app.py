@@ -1,13 +1,18 @@
 from fastapi import FastAPI, status, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models.api_data_models import AuthModel, TokenModel, StatusModel
 from error_responses import ErrorResponse
 from auth import create_token_for_player
+import clicker
 import db_controller
 
 app = FastAPI(
     title="Clicker-Backend"
 )
 
+http_bearer = HTTPBearer()
+
+#-------------------- Регистрация
 @app.post(path = "/registration",
     response_model = StatusModel,
     status_code = status.HTTP_200_OK,
@@ -25,6 +30,7 @@ async def registration(reg_data: AuthModel):
 
     return StatusModel(status=True)
 
+#-------------------- Аутентификация
 @app.post(path = "/auth",
     response_model = TokenModel,
     status_code = status.HTTP_200_OK,
@@ -39,6 +45,30 @@ async def auth(auth: AuthModel):
             detail = "Invalid login or password"
         )
     return token
+
+#-------------------- Клик
+@app.put(path = "/click",
+    response_model = StatusModel,
+    status_code = status.HTTP_200_OK,
+    responses = ErrorResponse.HTTP_401_UNAUTHORIZED | ErrorResponse.HTTP_429_TOO_MANY_REQUESTS
+)
+async def click(token: HTTPAuthorizationCredentials = Depends(http_bearer)):
+
+    click_result = clicker.click(token.credentials)
+
+    if click_result == clicker.ClickResultCodes.invalid_token:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Invalid token"
+        )
+    
+    elif click_result == clicker.ClickResultCodes.too_many_request:
+        raise HTTPException(
+            status_code = status.HTTP_429_TOO_MANY_REQUESTS,
+            detail = "Too Many Requests"
+        )
+    
+    return StatusModel(status=True)
 
 #команда для запуска
 #uvicorn app:app --host 0.0.0.0 --port 7777 --reload
